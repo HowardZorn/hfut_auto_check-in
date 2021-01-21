@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import datetime
+import pytz
 import base64
 import argparse
 from Crypto.Cipher import AES
@@ -25,8 +26,10 @@ class hfuter:
         ret = self.__login()
         if ret:
             print("{username}登录成功".format(username=self.username))
+            self.logged_in = True
         else:
             print("{username}登录失败！".format(username=self.username))
+            self.logged_in = False
 
     def __login(self) -> bool:
         def encrypt_password(text: str, key: str):
@@ -125,6 +128,9 @@ class hfuter:
             return False
 
     def basic_infomation(self):
+        if not self.logged_in:
+            return {}
+
         self.session.get(
             "http://stu.hfut.edu.cn/xsfw/sys/swmjbxxapp/*default/index.do")
 
@@ -177,8 +183,12 @@ class hfuter:
 
         return info['data']
 
-    def daily_checkin(self, address: str):
-        today = datetime.date.today().timetuple()[:3]
+    def daily_checkin(self, address: str) -> bool:
+        if not self.logged_in:
+            return False
+
+        today = datetime.datetime.now(
+            tz=pytz.timezone('Asia/Shanghai')).timetuple()[:3]
         self.session.get(
             "http://stu.hfut.edu.cn/xsfw/sys/swmxsyqxxsjapp/*default/index.do")
 
@@ -230,6 +240,24 @@ class hfuter:
             "http://stu.hfut.edu.cn/xsfw/sys/swmxsyqxxsjapp/modules/mrbpa/getSetting.do",
             data={"data": "{}"}
         ).json()
+
+        start_time = "%04d-%02d-%02d " % today + \
+            info['data']['DZ_TBKSSJ'] + " +0800"
+        start_time = datetime.datetime.strptime(
+            start_time, "%Y-%m-%d %H:%M:%S %z")
+        end_time = "%04d-%02d-%02d " % today + \
+            info['data']['DZ_TBJSSJ'] + " +0800"
+        end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S %z")
+        now_time = datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai'))
+
+        print("打卡起始时间:", start_time)
+        print("打卡结束时间:", end_time)
+        print("　　现在时间:", now_time)
+        if start_time < now_time and now_time < end_time:
+            print("在打卡时间内")
+        else:
+            print("不在打卡时间内")
+            return False
 
         self.session.headers.update(
             {"Content-Type": "application/x-www-form-urlencoded"})
