@@ -289,6 +289,8 @@ class hfuter:
         return ret['code'] == "0"
 
 
+# An example code demonstrating how to use the interfaces.
+# actually, it was already usable.
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('username', type=str, help="学工号")
@@ -299,3 +301,5 @@ if __name__ == "__main__":
     stu = hfuter(username=args.username, password=args.password)
     if stu.daily_checkin(args.address):
         print("签到成功~")
+    else:
+        print("签到失败！")
