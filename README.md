@@ -1,3 +1,5 @@
+因为本人毕业离校，本项目交由在校的[@hfut-xyc](https://github.com/hfut-xyc)同学接手，请访问[hfut-xyc/hfut_auto_check-in](https://github.com/hfut-xyc/hfut_auto_check-in)获得最新的脚本
+
 ```
 本项目遵从GPLv2协定，Copyright (C) 2021, Fw[a]rd
 
